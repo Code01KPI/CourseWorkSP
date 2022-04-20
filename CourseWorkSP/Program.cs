@@ -14,7 +14,7 @@ void GetStr(Parser parser)
         parser.Str = reader.ReadFile(f);
 
         tokenizer.Str = parser.Str;
-        tokenizer.Array = parser.ParseStr();
+        tokenizer.ArrayOfWord = parser.ParseStr();
 
         tokenizer.Analysis();
 
