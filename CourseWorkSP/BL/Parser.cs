@@ -17,6 +17,7 @@ namespace CourseWorkSP.BL
         /// </summary>
         public string? Str { get; set; }
 
+        // Регулярки для розбивки рядка.
         private Regex regex1 = new Regex(@"\s+");
 
         private Regex regex2 = new Regex(@"^\s+");
@@ -33,8 +34,6 @@ namespace CourseWorkSP.BL
 
         private Regex regex8 = new Regex(@"\,");
 
-        //private Regex regex9 = new Regex(@"(\w*)\s");
-
         public Parser() => Str = String.Empty;
 
         public string[]? ParseStr()
@@ -42,18 +41,19 @@ namespace CourseWorkSP.BL
             if (!string.IsNullOrEmpty(Str))
             {
                 string tmp = Str;
-                string[] result = null;
+                string[]? result = null;
 
                 if (tmp is not null)
+                {
                     tmp = regex1.Replace(tmp, " ");
-
-                tmp = regex2.Replace(tmp, "");
-                tmp = regex3.Replace(tmp, "");
-                tmp = regex4.Replace(tmp, "[ ");
-                tmp = regex5.Replace(tmp, " ]");
-                tmp = regex6.Replace(tmp, " * ");
-                tmp = regex7.Replace(tmp, " : ");
-                tmp = regex8.Replace(tmp, " ,");
+                    tmp = regex2.Replace(tmp, "");
+                    tmp = regex3.Replace(tmp, "");
+                    tmp = regex4.Replace(tmp, "[ ");
+                    tmp = regex5.Replace(tmp, " ]");
+                    tmp = regex6.Replace(tmp, " * ");
+                    tmp = regex7.Replace(tmp, " : ");
+                    tmp = regex8.Replace(tmp, " ,");
+                }
 
                 if (tmp is not null)
                     result = tmp.Split(' ');
