@@ -91,6 +91,11 @@ namespace CourseWorkSP.BL
                         if (machineCommand.Contains(ArrayOfWord[0]))
                         {
                             Console.WriteLine($"{1}  {ArrayOfWord[0]}  {ArrayOfWord[i].Length} - machine command");
+                            if(ArrayOfWord.Length == 1)
+                            {
+                                Console.WriteLine("| label | mnemocode | operand 1 | operand 2 |");
+                                Console.WriteLine("|  0    |  1  |  1  |  0  |  0  |  0  |  0  |");
+                            }
                             if (ArrayOfWord.Length < 2)
                                 break;
                             else
@@ -135,7 +140,7 @@ namespace CourseWorkSP.BL
                                 {
                                     int index = Array.IndexOf(ArrayOfWord, ",");
                                     Console.WriteLine("| label | mnemocode | operand 1 | operand 2 |");
-                                    Console.WriteLine($"|  0    |  1  |  1  |  2  |  {index - 1}  |  {index + 1}  |  {ArrayOfWord.Length - index - 1}  |");
+                                    Console.WriteLine($"|  0    |  1  |  1  |  2  |  {index - 1}  |  {index + 2}  |  {ArrayOfWord.Length - index - 1}  |");
                                 }
                                 else
                                 {
@@ -151,33 +156,33 @@ namespace CourseWorkSP.BL
                     {
                         if (dataDirectives.ContainsValue(ArrayOfWord[i]))
                         {
-                            Console.WriteLine($"{1}  {ArrayOfWord[0]}  {ArrayOfWord[i].Length} - user id or unknown");
-                            Console.WriteLine($"{2}  {ArrayOfWord[i]}  {ArrayOfWord[i].Length} - data directive");
+                            Console.WriteLine($"{1}  {ArrayOfWord[0]}  {ArrayOfWord[0].Length} - user id or unknown");
+                            Console.WriteLine($"{2}  {ArrayOfWord[1]}  {ArrayOfWord[1].Length} - data directive");
 
                             if (CheckConst(ArrayOfWord[2]) == 1)
-                                Console.WriteLine($"{3}  {ArrayOfWord[2]}  {ArrayOfWord[i].Length} - decimal number");
+                                Console.WriteLine($"{3}  {ArrayOfWord[2]}  {ArrayOfWord[2].Length} - decimal number");
                             else if (CheckConst(ArrayOfWord[2]) == 2)
-                                Console.WriteLine($"{3}  {ArrayOfWord[2]}  {ArrayOfWord[i].Length} - hex number");
+                                Console.WriteLine($"{3}  {ArrayOfWord[2]}  {ArrayOfWord[2].Length} - hex number");
                             else if (CheckConst(ArrayOfWord[2]) == 3)
-                                Console.WriteLine($"{3}  {ArrayOfWord[2]}  {ArrayOfWord[i].Length}  - str");
+                                Console.WriteLine($"{3}  {ArrayOfWord[2]}  {ArrayOfWord[2].Length}  - text constant");
                             Console.WriteLine("| label | mnemocode | operand 1 | operand 2 |");
                             Console.WriteLine("|  1    |  2  |  1  |  3  |  1  |  0  |  0  |");
                             break;
                         }
                         else if (ArrayOfWord[1] == "equ" || ArrayOfWord[1] == "EQU")
                         {
-                            Console.WriteLine($"{1}  {ArrayOfWord[0]}  {ArrayOfWord[i].Length} - user id or unknown");
-                            Console.WriteLine($"{2}  {ArrayOfWord[1]}  {ArrayOfWord[i].Length} - directive");
-                            Console.WriteLine($"{3}  {ArrayOfWord[2]}  {ArrayOfWord[i].Length} - decimal number"); //TODO: доробити.
+                            Console.WriteLine($"{1}  {ArrayOfWord[0]}  {ArrayOfWord[0].Length} - user id or unknown");
+                            Console.WriteLine($"{2}  {ArrayOfWord[1]}  {ArrayOfWord[1].Length} - directive");
+                            Console.WriteLine($"{3}  {ArrayOfWord[2]}  {ArrayOfWord[2].Length} - decimal number"); //TODO: доробити.
                             Console.WriteLine("| label | mnemocode | operand 1 | operand 2 |");
                             Console.WriteLine("|  1    |  2  |  1  |  3  |  1  |  0  |  0  |");
                             break;
                         }
                         else if (ArrayOfWord[1] == "=")
                         {
-                            Console.WriteLine($"{1}  {ArrayOfWord[0]}  {ArrayOfWord[i].Length} - user id or unknown");
-                            Console.WriteLine($"{2}  {ArrayOfWord[1]}  {ArrayOfWord[i].Length} - directive");
-                            Console.WriteLine($"{3}  {ArrayOfWord[2]}  {ArrayOfWord[i].Length} - devimal number"); //TODO: доробити.
+                            Console.WriteLine($"{1}  {ArrayOfWord[0]}  {ArrayOfWord[0].Length} - user id or unknown");
+                            Console.WriteLine($"{2}  {ArrayOfWord[1]}  {ArrayOfWord[1].Length} - directive");
+                            Console.WriteLine($"{3}  {ArrayOfWord[2]}  {ArrayOfWord[2].Length} - devimal number"); //TODO: доробити.
                             Console.WriteLine("| label | mnemocode | operand 1 | operand 2 |");
                             Console.WriteLine("|  1    |  2  |  1  |  3  |  1  |  0  |  0  |");
                             break;
