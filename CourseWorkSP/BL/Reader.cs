@@ -26,7 +26,7 @@ namespace CourseWorkSP.BL
         /// Метод для зчитування.
         /// </summary>
         /// <returns>Один зчитаний рядок</returns>
-        public string? ReadFile(StreamReader f)
+        public string ReadFile(StreamReader f)
         {
             IsReadStr = false;
             if(!f.EndOfStream)

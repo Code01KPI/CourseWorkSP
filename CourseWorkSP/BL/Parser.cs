@@ -15,7 +15,7 @@ namespace CourseWorkSP.BL
         /// <summary>
         /// Рядок.
         /// </summary>
-        public string? Str { get; set; }
+        public string Str { get; set; }
 
         // Регулярки для розбивки рядка.
         private Regex regex1 = new Regex(@"\s+");
@@ -34,10 +34,15 @@ namespace CourseWorkSP.BL
 
         private Regex regex8 = new Regex(@"\,");
 
+        private Regex regex9 = new Regex(@".\;");
+
+        private Regex regex10 = new Regex(@"\;");
+
         public Parser() => Str = String.Empty;
 
         public string[]? ParseStr()
         {
+            
             if (!string.IsNullOrEmpty(Str))
             {
                 string tmp = Str;
@@ -53,6 +58,8 @@ namespace CourseWorkSP.BL
                     tmp = regex6.Replace(tmp, " * ");
                     tmp = regex7.Replace(tmp, " : ");
                     tmp = regex8.Replace(tmp, " ,");
+                    tmp = regex9.Replace(tmp, " ; ");
+                    tmp = regex10.Replace(tmp, "; ");
                 }
 
                 if (tmp is not null)
