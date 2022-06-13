@@ -205,7 +205,13 @@ namespace CourseWorkSP.BL
                             MRM = 1;
                         else if (ArrayOfWord[i] == ":" && segmentRegisters.Contains(ArrayOfWord[i - 1].ToLower()))
                         {
-                            segmReplacePrefix = 1;
+                            if((ArrayOfWord[0].ToLower() == "not" || ArrayOfWord[0].ToLower() == "imul" || ArrayOfWord[0].ToLower() == "and") && ArrayOfWord[Array.IndexOf(ArrayOfWord, ":") - 1].ToLower() == "ds")
+                                    segmReplacePrefix = 0;
+                            else if(ArrayOfWord[0].ToLower() == "adc" && ArrayOfWord[Array.IndexOf(ArrayOfWord, ":")].ToLower() == "ss")
+                                    segmReplacePrefix = 0;
+                            else
+                                segmReplacePrefix = 1;
+
                             MRM = 1;
                             adressField = 4;
                             if (ArrayOfWord.Contains("[") || ArrayOfWord.Contains("]"))
