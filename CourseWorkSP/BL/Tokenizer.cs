@@ -153,7 +153,7 @@ namespace CourseWorkSP.BL
                         ++lineCount;
                         if (activeSeg == 0 && ArrayOfWord[1].ToLower() == "equ")
                             Errors.Add(new Error("Active_segment = 0", lineCount));
-
+                        
                         tmp = Calculator.Calc(String.Join(' ', ArrayOfWord, 2, ArrayOfWord.Length - 2));
                         size = tmp;
                         Add(new UserLabelAndVariable(ArrayOfWord[0], GetVarOrLabelType(ArrayOfWord[1]), GetHexNumber(adress), segmentName));
@@ -519,5 +519,10 @@ class Calculator
     /// </summary>
     /// <param name="Expression"></param>
     /// <returns></returns>
-    public static int Calc(string Expression) => Convert.ToInt32(Table.Compute(Expression, string.Empty));
+    public static int Calc(string Expression)
+    {
+        if (Expression.Contains('h'))
+            return Convert.ToInt32(Expression, 16);
+        return Convert.ToInt32(Table.Compute(Expression, string.Empty));
+    }
 }
