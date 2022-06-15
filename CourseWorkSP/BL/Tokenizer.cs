@@ -19,6 +19,11 @@ namespace CourseWorkSP.BL
         private static int lineCount = 0;
 
         /// <summary>
+        /// Додатковий лічильник рядків.
+        /// </summary>
+        private static int localLineCount = 0;
+
+        /// <summary>
         /// Розмір операнда.
         /// </summary>
         private static int size = 0;
@@ -42,6 +47,11 @@ namespace CourseWorkSP.BL
         /// Список для зберігання об'єктів опису змінних чи міток.
         /// </summary>
         public static List<UserLabelAndVariable> UserVar = new List<UserLabelAndVariable>();
+
+        /// <summary>
+        /// Словник міток.
+        /// </summary>
+        public static Dictionary<string, int> labels = new Dictionary<string, int>();
 
         /// <summary>
         /// Список для зберігання об'єктів опису помилок.
@@ -77,7 +87,7 @@ namespace CourseWorkSP.BL
             ["dw"] = 2,
             ["dd"] = 4,
             ["equ"] = 0,
-            ["="] = 0// TODO: доробити/переробити
+            ["="] = 0
         };
 
         private readonly string[] types = new string[] { "byte", "word", "dword" };
@@ -155,8 +165,8 @@ namespace CourseWorkSP.BL
                             Errors.Add(new Error("Active_segment = 0", lineCount));
                         
                         tmp = Calculator.Calc(String.Join(' ', ArrayOfWord, 2, ArrayOfWord.Length - 2));
+                        Add(new UserLabelAndVariable(ArrayOfWord[0], GetVarOrLabelType(ArrayOfWord[1]), GetHexNumber(adress), segmentName, lineCount));
                         size = tmp;
-                        Add(new UserLabelAndVariable(ArrayOfWord[0], GetVarOrLabelType(ArrayOfWord[1]), GetHexNumber(adress), segmentName));
                         Save.w.WriteLine($"{lineCount,0:d3}\t{GetHexNumber(adress)}\t{GetHexNumber(size, 1)} \t{getStr()}");
                         Console.WriteLine($"{lineCount,0:d3}\t{GetHexNumber(adress)}\t{GetHexNumber(size, 1)} \t{getStr()}");
                     }
@@ -167,7 +177,7 @@ namespace CourseWorkSP.BL
 
                         ++lineCount;
                         size = dataDirectives[ArrayOfWord[1]];
-                        Add(new UserLabelAndVariable(ArrayOfWord[0], GetVarOrLabelType(ArrayOfWord[1]), GetHexNumber(adress), segmentName));
+                        Add(new UserLabelAndVariable(ArrayOfWord[0], GetVarOrLabelType(ArrayOfWord[1]), GetHexNumber(adress), segmentName, lineCount));
                         Save.w.WriteLine($"{lineCount,0:d3}\t{GetHexNumber(adress)}\t{GetHexNumber(size)} \t{getStr()}");
                         Console.WriteLine($"{lineCount,0:d3}\t{GetHexNumber(adress)}\t{GetHexNumber(size)} \t{getStr()}");
                         adress += size;
@@ -180,7 +190,7 @@ namespace CourseWorkSP.BL
 
                     ++lineCount;
                     size = 0;
-                    Add(new UserLabelAndVariable(ArrayOfWord[0], GetVarOrLabelType(ArrayOfWord[1]), GetHexNumber(adress), segmentName));
+                    Add(new UserLabelAndVariable(ArrayOfWord[0], GetVarOrLabelType(ArrayOfWord[1]), GetHexNumber(adress), segmentName, lineCount));
                     Save.w.WriteLine($"{lineCount,0:d3}\t{GetHexNumber(adress)}\t{GetHexNumber(size)} \t{getStr()}");
                     Console.WriteLine($"{lineCount,0:d3}\t{GetHexNumber(adress)}\t{GetHexNumber(size)} \t{getStr()}");
                 }
@@ -202,13 +212,23 @@ namespace CourseWorkSP.BL
                     for (int i = 0; i < ArrayOfWord.Length; i++)
                     {
                         if (ArrayOfWord[i].ToLower() == "short" && ArrayOfWord[i - 1].ToLower() == "jmp" || ArrayOfWord[0].ToLower() == "jnbe")
-                            MRM = 1;
+                        {
+                            if (ArrayOfWord[1].ToLower() == "short" && FindLabel(ArrayOfWord[2]) > lineCount)
+                                MRM = 5;
+                            else if (ArrayOfWord[0].ToLower() == "jnbe" && FindLabel(ArrayOfWord[1]) > lineCount)
+                                MRM = 5;
+                            else if ((ArrayOfWord[1].ToLower() == "short" && FindLabel(ArrayOfWord[2]) == 0) || ((ArrayOfWord[0].ToLower() == "jnbe" && FindLabel(ArrayOfWord[1]) == 0)))
+                                Errors.Add(new Error("The required label is missing", lineCount));
+                            else
+                                MRM = 1;
+                            break;
+                        }
                         else if (ArrayOfWord[i] == ":" && segmentRegisters.Contains(ArrayOfWord[i - 1].ToLower()))
                         {
-                            if((ArrayOfWord[0].ToLower() == "not" || ArrayOfWord[0].ToLower() == "imul" || ArrayOfWord[0].ToLower() == "and") && ArrayOfWord[Array.IndexOf(ArrayOfWord, ":") - 1].ToLower() == "ds")
-                                    segmReplacePrefix = 0;
-                            else if(ArrayOfWord[0].ToLower() == "adc" && ArrayOfWord[Array.IndexOf(ArrayOfWord, ":")].ToLower() == "ss")
-                                    segmReplacePrefix = 0;
+                            if ((ArrayOfWord[0].ToLower() == "not" || ArrayOfWord[0].ToLower() == "imul" || ArrayOfWord[0].ToLower() == "and") && ArrayOfWord[Array.IndexOf(ArrayOfWord, ":") - 1].ToLower() == "ds")
+                                segmReplacePrefix = 0;
+                            else if (ArrayOfWord[0].ToLower() == "adc" && ArrayOfWord[Array.IndexOf(ArrayOfWord, ":")].ToLower() == "ss")
+                                segmReplacePrefix = 0;
                             else
                                 segmReplacePrefix = 1;
 
@@ -436,6 +456,34 @@ namespace CourseWorkSP.BL
             }
                 
         }
+
+        /// <summary>
+        /// Метод для пошуку і опису міток.
+        /// </summary>
+        public void VariableProcessing()
+        {
+            if (Str is not null && ArrayOfWord is not null && ArrayOfWord.Length > 0)
+            {
+                ++localLineCount;
+                if (ArrayOfWord.Length >= 2 && ArrayOfWord[1] == ":")
+                    labels.Add(ArrayOfWord[0], localLineCount);
+            }
+        }
+
+        /// <summary>
+        /// Метод який повертає рядок на якому знаходиться певна мітка.
+        /// </summary>
+        /// <param name="label"></param>
+        /// <returns></returns>
+        public int FindLabel(string label)
+        {
+            foreach (var el in labels)
+            {
+                if (labels.ContainsKey(label))
+                    return labels[label];
+            }
+            return 0;
+        }
     }
 }
 
@@ -460,6 +508,11 @@ class UserLabelAndVariable
     public string type;
 
     /// <summary>
+    /// Номер рядка.
+    /// </summary>
+    public int line;
+
+    /// <summary>
     /// Адреса в пам'яті.
     /// </summary>
     public string adress;
@@ -476,12 +529,13 @@ class UserLabelAndVariable
     /// <param name="type"></param>
     /// <param name="adress"></param>
     /// <param name="segment"></param>
-    public UserLabelAndVariable(string name, string type, string adress, string segment)
+    public UserLabelAndVariable(string name, string type, string adress, string segment, int line)
     {
         this.name = name;
         this.segment = segment;
         this.type = type;
         this.adress = adress;
+        this.line = line;
     }
 }
 

@@ -5,7 +5,7 @@ Console.WriteLine("Written by Statechniy Serhii KV-03");
 Console.WriteLine($"File name: ");
 Console.WriteLine("1-line, 2-address, 3-size, 4-assembly operator");
 
-Reader reader = new Reader("C:\\test2.asm");
+Reader reader = new Reader("C:\\test3.asm");
 Parser parser = new Parser();
 Save saver = new Save("results.lst");
 Tokenizer tokenizer = new Tokenizer();
@@ -41,6 +41,21 @@ void GetStr(Parser parser)
         tokenizer.Str = parser.Str;
         tokenizer.ArrayOfWord = parser.ParseStr();
 
+        tokenizer.VariableProcessing();
+
+        if (!reader.IsReadStr)
+            break;
+    }
+    f.Close();
+
+    StreamReader f1 = new StreamReader(reader.FileName);
+    while (true)
+    {
+        parser.Str = reader.ReadFile(f1);
+
+        tokenizer.Str = parser.Str;
+        tokenizer.ArrayOfWord = parser.ParseStr();
+
         tokenizer.Analysis();
 
         if (!reader.IsReadStr)
@@ -48,4 +63,10 @@ void GetStr(Parser parser)
     }
     f.Close();
 }
+
+
+
+
+
+
 
