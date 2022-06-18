@@ -53,7 +53,7 @@ namespace CourseWorkSP.BL
                     tmp = regex1.Replace(tmp, " ");
                     tmp = regex2.Replace(tmp, "");
                     tmp = regex3.Replace(tmp, "");
-                    tmp = regex4.Replace(tmp, "[ ");
+                    tmp = regex4.Replace(tmp, " [ ");
                     tmp = regex5.Replace(tmp, " ]");
                     tmp = regex6.Replace(tmp, " * ");
                     tmp = regex7.Replace(tmp, " : ");

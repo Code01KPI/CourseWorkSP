@@ -1,6 +1,6 @@
 ﻿using CourseWorkSP.BL;
 
-Console.WriteLine("Assembly translator STEP 1");
+Console.WriteLine("Assembly translator STEP 2");
 Console.WriteLine("Written by Statechniy Serhii KV-03");
 Console.WriteLine($"File name: ");
 Console.WriteLine("1-line, 2-address, 3-size, 4-assembly operator");
@@ -57,6 +57,21 @@ void GetStr(Parser parser)
         tokenizer.ArrayOfWord = parser.ParseStr();
 
         tokenizer.Analysis();
+
+        if (!reader.IsReadStr)
+            break;
+    }
+    f.Close();
+
+    StreamReader f2 = new StreamReader(reader.FileName);
+    while (true)
+    {
+        parser.Str = reader.ReadFile(f2);
+
+        tokenizer.Str = parser.Str;
+        tokenizer.ArrayOfWord = parser.ParseStr();
+
+        tokenizer.Analysis2();
 
         if (!reader.IsReadStr)
             break;
