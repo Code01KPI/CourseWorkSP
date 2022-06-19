@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Text.RegularExpressions;
-using System.Globalization;
 using CourseWorkSP.BL;
 using System.Data;
 
@@ -137,22 +136,6 @@ namespace CourseWorkSP.BL
         };
 
         /// <summary>
-        /// Словник байтів машинних команд.
-        /// </summary>
-        /*private readonly Dictionary<string, string> machineCommandBytes = new Dictionary<string, string>()
-        {
-            ["jmp"] = "EB",
-            ["jnbe"] = "77",
-            ["std"] = "FD",
-            ["dec"] = "4A",
-            ["not"] = "F7",
-            ["rcl"] = "D2",
-            ["imul"] = "0F AF",
-            ["and"] = "20",
-            ["btr"] = "0F BA",
-            ["adc"] = "83"
-        };*/
-        /// <summary>
         /// Масив 32 розрядних регістрів.
         /// </summary>
         private readonly string[] registersOfSize32 = new string[] { "eax", "ecx", "edx", "ebx", "esp", "ebp", "esi", "edi"};
@@ -170,7 +153,7 @@ namespace CourseWorkSP.BL
         /// <summary>
         /// Метод токінайзер.
         /// </summary>
-        public void Analysis()
+        public void Analysis1()
         {
             int tmp;
             string sizeOperand = String.Empty;
@@ -196,8 +179,6 @@ namespace CourseWorkSP.BL
 
                     ++lineCount;
                     size = 0;
-                    //Save.w.WriteLine($"{lineCount,0:d3}\t{GetHexNumber(adress)}\t{GetHexNumber(size)} \t{getStr()}");
-                    //Console.WriteLine($"{lineCount,0:d3}\t{GetHexNumber(adress)}\t{GetHexNumber(size)} \t{getStr()}");
                 }
                 else if (ArrayOfWord.Length > 2 && dataDirectives.ContainsKey(ArrayOfWord[1]))
                 {
@@ -211,16 +192,12 @@ namespace CourseWorkSP.BL
                         if (tmp == int.MinValue)
                         {
                             Add(new UserLabelAndVariable(ArrayOfWord[0], GetVarOrLabelType(ArrayOfWord[1]), GetHexNumber(adress), segmentName, lineCount, constBuffer));
-                            //Save.w.WriteLine($"{lineCount,0:d3}\t{GetHexNumber(adress)}\t{constBuffer} \t{getStr()}");
-                            //Console.WriteLine($"{lineCount,0:d3}\t{GetHexNumber(adress)}\t{constBuffer} \t{getStr()}");
                             constBuffer = String.Empty;
                         }
                         else
                         {
                             size = Math.Abs(tmp);
                             Add(new UserLabelAndVariable(ArrayOfWord[0], GetVarOrLabelType(ArrayOfWord[1]), GetHexNumber(adress), segmentName, lineCount, GetHexNumber(size)));
-                            //Save.w.WriteLine($"{lineCount,0:d3}\t{GetHexNumber(adress)}\t{GetHexNumber(size, 1)} \t{getStr()}");
-                            //Console.WriteLine($"{lineCount,0:d3}\t{GetHexNumber(adress)}\t{GetHexNumber(size, 1)} \t{getStr()}");
                         }
                     }
                     else
@@ -234,8 +211,6 @@ namespace CourseWorkSP.BL
                             sizeOperand += "00";
 
                         Add(new UserLabelAndVariable(ArrayOfWord[0], GetVarOrLabelType(ArrayOfWord[1]), GetHexNumber(adress), segmentName, lineCount, sizeOperand));
-                        //Save.w.WriteLine($"{lineCount,0:d3}\t{GetHexNumber(adress)}\t{GetHexNumber(size)} \t{getStr()}");
-                        //Console.WriteLine($"{lineCount,0:d3}\t{GetHexNumber(adress)}\t{GetHexNumber(size)} \t{getStr()}");
                         adress += size;
                     }
                 }
@@ -246,10 +221,7 @@ namespace CourseWorkSP.BL
 
                     ++lineCount;  
                     size = 0;
-                    Console.WriteLine(GetHexNumber(adress));
                     Add(new UserLabelAndVariable(ArrayOfWord[0], GetVarOrLabelType(ArrayOfWord[1]), GetHexNumber(adress), segmentName, lineCount, null));
-                    //Save.w.WriteLine($"{lineCount,0:d3}\t{GetHexNumber(adress)}\t{GetHexNumber(size)} \t{getStr()}");
-                    //Console.WriteLine($"{lineCount,0:d3}\t{GetHexNumber(adress)}\t{GetHexNumber(size)} \t{getStr()}");
                 }
                 else if (machineCommand.ContainsKey(ArrayOfWord[0].ToLower()) || ArrayOfWord.Length >= 3 && machineCommand.ContainsKey(ArrayOfWord[2].ToLower()))
                 {
@@ -270,10 +242,6 @@ namespace CourseWorkSP.BL
                     {
                         if (ArrayOfWord[i].ToLower() == "short" && ArrayOfWord[i - 1].ToLower() == "jmp" || ArrayOfWord[0].ToLower() == "jnbe")
                         {
-                            /*if (ArrayOfWord[1].ToLower() == "short" && FindLabel(ArrayOfWord[2]) > lineCount)
-                            {
-                                MRM = 5;
-                            }*/
                             if (ArrayOfWord[0].ToLower() == "jnbe" && FindLabel(ArrayOfWord[1]) > lineCount)
                             {
                                 MRM = 5;
@@ -356,8 +324,6 @@ namespace CourseWorkSP.BL
                     }
                     size = machineCommand[ArrayOfWord[0].ToLower()] + segmReplacePrefix + MRM + SIB + adressField + operandField;
 
-                    //Save.w.WriteLine($"{lineCount,0:d3}\t{GetHexNumber(adress)}\t{GetHexNumber(size)} \t{getStr()}");
-                    //Console.WriteLine($"{lineCount,0:d3}\t{GetHexNumber(adress)}\t{GetHexNumber(size)} \t{getStr()}");
                     adress += size;
                 }
                 else
@@ -365,8 +331,6 @@ namespace CourseWorkSP.BL
                     if(ArrayOfWord[0].ToLower() == "end")
                     {
                         size = 0;
-                        //Save.w.WriteLine($"{lineCount,0:d3}\t{GetHexNumber(adress)}\t{GetHexNumber(size)} \t{getStr()}");
-                        //Console.WriteLine($"{lineCount,0:d3}\t{GetHexNumber(adress)}\t{GetHexNumber(size)} \t{getStr()}");
                     }
                     else if (!ArrayOfWord.Contains("end") && !ArrayOfWord.Contains(";"))
                         Errors.Add(new Error("Error, invalid instruction", lineCount));
@@ -394,19 +358,23 @@ namespace CourseWorkSP.BL
                         Console.WriteLine();
                         activeSeg = 1;
                         adress = 0;
-                        //segmentName = ArrayOfWord[0];
+                        segmentName = ArrayOfWord[0];
                     }
                     else if (ArrayOfWord[1].ToLower() == "ends")
                     {
                         activeSeg = 0;
-                        //segmentSize = GetHexNumber(adress);
-                        //segmentInfo[segmentName] = segmentSize;
+                        segmentSize = GetHexNumber(adress);
+                        segmentInfo[segmentName] = segmentSize;
                     }
 
                     ++lineCount2Step;
                     size = 0;
-                    Save.w.WriteLine($"{lineCount2Step,0:d3}\t{GetHexNumber(adress)}\t \t{getStr()}");
-                    Console.WriteLine($"{lineCount2Step,0:d3}\t{GetHexNumber(adress)}\t \t{getStr()}");
+                    string adressStr = GetHexNumber(adress);
+                    while (adressStr.Length < 3)
+                        adressStr = adressStr + " ";
+
+                    Save.w.WriteLine($"{lineCount2Step,0:d3}   {adressStr}\t\t\t\t  {getStr()}");
+                    Console.WriteLine($"{lineCount2Step,0:d3}   {adressStr}\t\t\t\t  {getStr()}");
                 }
                 else if (ArrayOfWord.Length > 2 && dataDirectives.ContainsKey(ArrayOfWord[1]))
                 {
@@ -417,8 +385,17 @@ namespace CourseWorkSP.BL
                             Errors.Add(new Error("Active_segment = 0", lineCount));
 
                         //tmp = Calculator.Calc(String.Join(' ', ArrayOfWord, 2, ArrayOfWord.Length - 2));
-                        Save.w.WriteLine($"{lineCount2Step,0:d3}\t{GetHexNumber(adress)}\t={FindConstAndVar(ArrayOfWord[0])}\t{getStr()}");
-                        Console.WriteLine($"{lineCount2Step,0:d3}\t{GetHexNumber(adress)}\t={FindConstAndVar(ArrayOfWord[0])}\t{getStr()}");
+                        string adressStr = GetHexNumber(adress);
+                        while (adressStr.Length < 3)
+                            adressStr = adressStr + " ";
+                        string operandStr = $"={FindConstAndVar(ArrayOfWord[0])}";
+                        if (int.TryParse(ArrayOfWord[ArrayOfWord.Length - 1], out int constResult))
+                            if (constResult < 0)
+                                operandStr = operandStr.Insert(1, "-");
+                        while (operandStr.Length < 30)
+                            operandStr = operandStr + " ";
+                        Save.w.WriteLine($"{lineCount2Step,0:d3}   {adressStr}   {operandStr}{getStr()}");
+                        Console.WriteLine($"{lineCount2Step,0:d3}   {adressStr}   {operandStr}{getStr()}");
                     }
                     else
                     {
@@ -464,14 +441,16 @@ namespace CourseWorkSP.BL
                             else
                             {
                                 buffer = ArrayOfWord[ArrayOfWord.Length - 1];
-                                if (Convert.ToInt32(ArrayOfWord[ArrayOfWord.Length - 1]) < 0)
-                                    buffer = buffer.Trim('-');
 
-                                if (Convert.ToInt32(buffer) > 255)
+                                if (Convert.ToInt32(buffer) > 255 || Convert.ToInt32(buffer) < -256)
                                     Errors.Add(new Error("The value of the variable or constant is too large", lineCount2Step));
                                 else
                                 {
-                                    bytes.Add(GetHexNumber(Convert.ToInt32(buffer)));
+                                    string dbBuffer = String.Empty;
+                                    dbBuffer = GetHexNumber(Convert.ToInt32(buffer));
+                                    while (dbBuffer.Length > 2)
+                                        dbBuffer = dbBuffer.Remove(0, 1);
+                                    bytes.Add(dbBuffer);
                                 }
                             }
                         }
@@ -571,8 +550,14 @@ namespace CourseWorkSP.BL
                         }
 
                         result = string.Join("", bytes.ToArray());
-                        Save.w.WriteLine($"{lineCount2Step,0:d3}\t{GetHexNumber(adress)}\t{result}\t{getStr()}");
-                        Console.WriteLine($"{lineCount2Step,0:d3}\t{GetHexNumber(adress)}\t{result}\t{getStr()}");
+                        while (result.Length < 30)
+                            result = result + " ";
+
+                        string adressStr = GetHexNumber(adress);
+                        while (adressStr.Length < 3)
+                            adressStr = adressStr + " ";
+                        Save.w.WriteLine($"{lineCount2Step,0:d3}   {adressStr}   {result}{getStr()}");
+                        Console.WriteLine($"{lineCount2Step,0:d3}   {adressStr}   {result}{getStr()}");
                         adress += size;
                         bytes.Clear();
                     }
@@ -583,8 +568,12 @@ namespace CourseWorkSP.BL
                         Errors.Add(new Error("Active_segment = 0", lineCount));
 
                     ++lineCount2Step;
-                    Save.w.WriteLine($"{lineCount2Step,0:d3}\t{GetHexNumber(adress)}\t\t{getStr()}");
-                    Console.WriteLine($"{lineCount2Step,0:d3}\t{GetHexNumber(adress)}\t\t{getStr()}");
+                    string adressStr = GetHexNumber(adress);
+                    while (adressStr.Length < 3)
+                        adressStr = adressStr + " ";
+
+                    Save.w.WriteLine($"{lineCount2Step,0:d3}   {adressStr}\t\t\t\t  {getStr()}");
+                    Console.WriteLine($"{lineCount2Step,0:d3}   {adressStr}\t\t\t\t  {getStr()}");
                 }
                 else if (machineCommand.ContainsKey(ArrayOfWord[0].ToLower()) || ArrayOfWord.Length >= 3 && machineCommand.ContainsKey(ArrayOfWord[2].ToLower()))
                 {
@@ -639,7 +628,6 @@ namespace CourseWorkSP.BL
                         }
                         else if (ArrayOfWord[0].ToLower() == "std")
                         {
-                            Console.WriteLine("lol");
                             machineCommandByte = "FD";
                         }
                         else if (ArrayOfWord[0].ToLower() == "dec")
@@ -977,7 +965,12 @@ namespace CourseWorkSP.BL
                                     }
                                 }
                                 else if (ArrayOfWord[i] == "[" && FindConstAndVar(ArrayOfWord[i - 1]) == null)
+                                {
+                                    MRM = 1;
+                                    SIB = 1;
+                                    adressField = 4;
                                     adressFieldByte = "00000000";
+                                }
 
                                 buffer = String.Join(' ', ArrayOfWord, Array.IndexOf(ArrayOfWord, "[") + 1, Array.IndexOf(ArrayOfWord, "]") - (Array.IndexOf(ArrayOfWord, "[") + 1));
                                 if (buffer == "eax * 2")
@@ -1049,7 +1042,9 @@ namespace CourseWorkSP.BL
                                 MRMByte = "F5";
 
                             if (FindConstAndVar(ArrayOfWord[ArrayOfWord.Length - 1], true) != null)
+                            {
                                 operandFieldByte = FindConstAndVar(ArrayOfWord[ArrayOfWord.Length - 1], true);
+                            }
                             else
                             {
                                 string buffer1 = String.Empty;
@@ -1144,64 +1139,117 @@ namespace CourseWorkSP.BL
                                 SIBByte = "AD";
                             else if (buffer == "ebp * 8")
                                 SIBByte = "ED";
-                        }
-                    }
 
-                    if (FindConstAndVar(ArrayOfWord[ArrayOfWord.Length - 1], true) != null)
-                        operandFieldByte = FindConstAndVar(ArrayOfWord[ArrayOfWord.Length - 1], true);
-                    else
-                    {
-                        string buffer1 = String.Empty;
-                        int bufferInt1 = 0;
-                        char[] bufferArray1;
-                        if (CheckConst(ArrayOfWord[ArrayOfWord.Length - 1]) == 2)
-                        {
-                            buffer1 = ArrayOfWord[ArrayOfWord.Length - 1];
-                            buffer1 = buffer1.Trim('h');
-                            if (Convert.ToInt32(buffer1, 16) >= 2147483647)
-                                Errors.Add(new Error("The value of the variable or constant is too large", lineCount2Step));
+                            if (FindConstAndVar(ArrayOfWord[Array.IndexOf(ArrayOfWord, "[") - 1], true) != null || FindConstAndVar(ArrayOfWord[Array.IndexOf(ArrayOfWord, "[") - 1]) != null)
+                            {
+                                adressField = 4;
+                                if (FindConstAndVar(ArrayOfWord[Array.IndexOf(ArrayOfWord, "[") - 1], true) != null)
+                                {
+                                    buffer = FindConstAndVar(ArrayOfWord[Array.IndexOf(ArrayOfWord, "[") - 1], true);
+                                    while (buffer.Length < 8)
+                                        buffer = buffer.Insert(0, "0");
+
+                                    adressFieldByte = buffer;
+                                }
+                                else if (FindConstAndVar(ArrayOfWord[Array.IndexOf(ArrayOfWord, "[") - 1]) != null)
+                                {
+                                    buffer = FindConstAndVar(ArrayOfWord[Array.IndexOf(ArrayOfWord, "[") - 1]);
+                                    if (buffer.Length > 2)
+                                        adressFieldByte = "00000001r";
+                                    else
+                                        adressFieldByte = "00000000r";
+                                }
+                            }
                             else
                             {
-                                if (buffer1.Length > 8 && buffer1.StartsWith('0'))
-                                    buffer1 = buffer1.TrimStart('0');
-
-                                if (buffer1.Length < 2 || buffer1.Length % 2 == 1)
-                                    buffer1 = buffer1.Insert(0, "0");
-                                operandFieldByte = buffer1;
+                                adressField = 4;
+                                adressFieldByte = "00000000";
                             }
-                        }
-                        else if (CheckConst(ArrayOfWord[ArrayOfWord.Length - 1]) == 3)
-                        {
-                            buffer1 = ArrayOfWord[3].Trim('\'');
-                            bufferArray1 = new char[buffer1.Length];
-                            bufferArray1 = buffer1.ToCharArray();
-                            buffer1 = String.Empty;
-                            foreach(var el in bufferArray1)
+
+
+                            if (FindConstAndVar(ArrayOfWord[ArrayOfWord.Length - 1], true) != null)
                             {
-                                buffer1 += ((int)el).ToString();
+                                operandFieldByte = FindConstAndVar(ArrayOfWord[ArrayOfWord.Length - 1], true);
+                                operandField = operandFieldByte.Length / 2;
                             }
-                            operandFieldByte = buffer1;
-                        }
-                        else
-                        {
-                            buffer1 = ArrayOfWord[ArrayOfWord.Length - 1];
-                            if (int.TryParse(buffer1, out int result1))
-                                buffer1 = buffer1.Trim('-');
-
-                            if (int.TryParse(buffer1, out int result2) && result2 > 2147483647)
-                                Errors.Add(new Error("The value of the variable or constant is too large", lineCount2Step));
                             else
                             {
-                                operandFieldByte = buffer1;
+                                string buffer1 = String.Empty;
+                                int bufferInt1 = 0;
+                                char[] bufferArray1;
+                                if (CheckConst(ArrayOfWord[ArrayOfWord.Length - 1]) == 2)
+                                {
+                                    buffer1 = ArrayOfWord[ArrayOfWord.Length - 1];
+                                    buffer1 = buffer1.Trim('h');
+                                    //if (Convert.ToInt32(buffer1, 16) >= 2147483647)
+                                    //Errors.Add(new Error("The value of the variable or constant is too large", lineCount2Step));
+                                    //else
+                                    {
+                                        if (buffer1.Length > 8 && buffer1.StartsWith('0'))
+                                            buffer1 = buffer1.TrimStart('0');
+
+                                        if (buffer1.Length < 2 || buffer1.Length % 2 == 1)
+                                            buffer1 = buffer1.Insert(0, "0");
+                                        operandFieldByte = buffer1;
+                                        operandField = buffer1.Length / 2;
+                                    }
+                                }
+                                else if (CheckConst(ArrayOfWord[ArrayOfWord.Length - 1]) == 3)
+                                {
+                                    buffer1 = ArrayOfWord[3].Trim('\'');
+                                    bufferArray1 = new char[buffer1.Length];
+                                    bufferArray1 = buffer1.ToCharArray();
+                                    buffer1 = String.Empty;
+                                    foreach (var el in bufferArray1)
+                                    {
+                                        buffer1 += ((int)el).ToString();
+                                    }
+                                    operandFieldByte = buffer1;
+                                    operandField = buffer1.Length / 2;
+                                }
+                                else
+                                {
+                                    buffer1 = ArrayOfWord[ArrayOfWord.Length - 1];
+                                    if (int.TryParse(buffer1, out int result1))
+                                        buffer1 = buffer1.Trim('-');
+
+                                    if (int.TryParse(buffer1, out int result2) && result2 > 2147483647)
+                                        Errors.Add(new Error("The value of the variable or constant is too large", lineCount2Step));
+                                    else
+                                    {
+                                        operandFieldByte = buffer1;
+                                        operandField = buffer1.Length / 2;
+                                    }
+                                }
                             }
                         }
                     }
                     result = changeAdressByte + " " + segmReplacePrefixByte + " " + machineCommandByte + " " + MRMByte + " " + SIBByte + " " + adressFieldByte + " " + operandFieldByte;
                     size += changeAdress + segmReplacePrefix + MRM + SIB + adressField + operandField;
-                    Save.w.WriteLine($"{lineCount2Step,0:d3}\t{GetHexNumber(adress)}\t{result}\t{getStr()}");
-                    Console.WriteLine($"{lineCount2Step,0:d3}\t{GetHexNumber(adress)}\t{result}\t{getStr()}");
+
+
+                    while (result.Length < 30)
+                        result = result + " ";
+
+                    string adressStr = GetHexNumber(adress);
+                    while (adressStr.Length < 3)
+                        adressStr = adressStr + " ";
+
+                    Save.w.WriteLine($"{lineCount2Step,0:d3}   {adressStr}  {result} {getStr()}");
+                    Console.WriteLine($"{lineCount2Step,0:d3}   {adressStr}  {result} {getStr()}");
                     adress += size;
                 }
+
+                if (ArrayOfWord[0].ToLower() == "end")
+                {
+                    ++lineCount2Step;
+                    string adressStr = GetHexNumber(adress);
+                    while (adressStr.Length < 3)
+                        adressStr = adressStr + " ";
+                    Save.w.WriteLine($"{lineCount2Step,0:d3}   {adressStr}\t\t\t\t  {getStr()}");
+                    Console.WriteLine($"{lineCount2Step,0:d3}   {adressStr}\t\t\t\t  {getStr()}");
+                }
+
             }
         }
 

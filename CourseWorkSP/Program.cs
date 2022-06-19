@@ -5,7 +5,7 @@ Console.WriteLine("Written by Statechniy Serhii KV-03");
 Console.WriteLine($"File name: ");
 Console.WriteLine("1-line, 2-address, 3-size, 4-assembly operator");
 
-Reader reader = new Reader("C:\\test3.asm");
+Reader reader = new Reader("C:\\test5.asm");
 Parser parser = new Parser();
 Save saver = new Save("results.lst");
 Tokenizer tokenizer = new Tokenizer();
@@ -56,7 +56,7 @@ void GetStr(Parser parser)
         tokenizer.Str = parser.Str;
         tokenizer.ArrayOfWord = parser.ParseStr();
 
-        tokenizer.Analysis();
+        tokenizer.Analysis1();
 
         if (!reader.IsReadStr)
             break;
